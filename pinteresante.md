@@ -8,9 +8,6 @@ A continuación encontrarás los requisitos y listados de código para construir
 * Git, Ruby y Ruby on Rails. Si estás en Mac o Linux sigue las instrucciones en http://installrails.com/. Para Windows sigue las instrucciones en:
   * Git: https://makeitreal.wistia.com/medias/9jjnpri7lf
   * Ruby: https://makeitreal.wistia.com/medias/b85w0goonx
-
-Opcional:
-
 * Crea una cuenta en [Github](https://github.com/).
 * Crea una cuenta en [Heroku](http://heroku.com/).
 * Descarga el [Heroku Toolbelt](https://toolbelt.heroku.com/).
@@ -118,7 +115,7 @@ $ rails generate devise:views
         <% end %>
       </ul>
     </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
+  </div><!-- /.container -->
 </nav>
 ```
 
