@@ -30,31 +30,199 @@ $ git add .
 $ git commit -m 'Versión inicial'
 ```
 
-### Configurar Bootstrap y Devise
+### Implementar la funcionalidad
 
-Bootstrap: https://github.com/twbs/bootstrap-sass<br>
+**Listado 3**.
+
+```
+$ rails g resource Pin title image_url
+$ rake db:migrate
+```
+
+**Listado 4**. En `app/controllers/pins_controller.rb`
+
+```
+def index
+  @pins = Pin.all
+end
+```
+
+**Listado 5**. En `app/views/pins/index.html.erb`
+
+```
+<div id="pins">
+<% @pins.each do |pin| %>
+  <div class="pin panel panel-default">
+    <div class="panel-body">
+      <img src="<%= pin.image_url %>" alt="<%= pin.title %>">
+      <h2><%= pin.title %></h2>
+    </div>
+  </div>
+<% end %>
+</div>
+```
+
+**Listado 6**. En `config/routes.rb`
+
+```
+root 'pins#index'
+```
+
+Algunos links a imágenes:
+
+* https://s3.amazonaws.com/makeitreal/projects/e-commerce/camiseta-1.jpg
+* https://s3.amazonaws.com/makeitreal/pins/lamborghini.jpg
+* https://s3.amazonaws.com/makeitreal/pins/luxury-car.jpg
+* https://s3.amazonaws.com/makeitreal/pins/office.jpg
+* https://s3.amazonaws.com/makeitreal/pins/tianmen.jpg
+
+(crear un pin por la consola y probar el listar)
+
+**Listado 7**. En `app/controllers/pins_controller.rb`
+
+```
+def new
+  @pin = Pin.new
+end
+```
+
+**Listado 8**. En `app/views/pins/new.html.erb`
+
+```
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6 col-sm-offset-3">
+      <h1>Nuevo Pin</h1>
+
+      <%= form_for @pin do |f| %>
+        <div class="form-group">
+          <%= f.label :title %>
+          <%= f.text_field :title, class: "form-control" %>
+        </div>
+        <div class="form-group">
+          <%= f.label :image_url %>
+          <%= f.url_field :image_url, class: "form-control" %>
+        </div>
+
+        <div class="action">
+          <%= f.submit class: "btn btn-primary btn-lg btn-block" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+```
+
+**Listado 9**. En `app/controllers/pins_controller.rb`
+
+```
+def create
+  pin = Pin.new(pin_params)
+  if pin.save
+    redirect_to root_path
+  else
+    render :new
+  end
+end
+
+private
+  def pin_params
+    params.require(:pin).permit(:title, :image_url)
+  end
+```
+
+**Listado 10**.
+
+```
+$ git add .
+$ git commit -m 'Implementa la funcionalidad de listar y crear pines'
+```
+
+### Configurar Devise
+
 Devise: https://github.com/plataformatec/devise
 
-**Listado 3**. En el archivo `Gemfile`.
+
+**Listado 11**. En el archivo `Gemfile`.
+
+```
+gem 'devise'
+```
+
+**Listado 12**.
+
+```
+$ bundle install
+```
+
+**Listado 13**.
+
+```
+$ rails generate devise:install
+```
+
+**Listado 14**.
+
+```
+$ rails generate devise User
+$ rake db:migrate
+```
+
+**Listado 15**. Crear la relación entre Pin y User
+
+```
+$ rails generate migration add_user_to_pins user:references
+$ rake db:migrate
+```
+
+**Listado 16**. En `app/controllers/pins_controller.rb`
+
+```
+pin.user = current_user
+```
+
+**Listado 17**. En `app/views/pins/index.html.erb`
+
+```
+<p class="user">Publicado por <%= pin.user.email %></p>
+```
+
+**Listado 18**. En `app/views/layout/application.html.erb`
+
+```
+<%= link_to "Registrarse", new_user_registration_path %><br>
+<%= link_to "Ingresar", new_user_session_path %>
+```
+
+**Listado 19**.
+
+```
+$ git add .
+$ git commit -m 'Implementa el manejo de usuarios'
+```
+
+## Configurar Bootstrap
+
+**Listado 19**. En el archivo `Gemfile`.
 
 ```
 gem 'bootstrap-sass', '~> 3.3.5'
 ```
 
-**Listado 4**. En el archivo `app/assets/stylesheets/application.scss`
+**Listado 20**. En el archivo `app/assets/stylesheets/application.scss`
 
 ```
 @import "bootstrap-sprockets";
 @import "bootstrap";
 ```
 
-**Listado 5**. En el archivo `app/assets/javascripts/application.js`
+**Listado 21**. En el archivo `app/assets/javascripts/application.js`
 
 ```
 //= require bootstrap-sprockets
 ```
 
-**Listado 6**.
+**Listado 22**.
 
 ```
 $ bundle install
@@ -62,33 +230,7 @@ $ git add .
 $ git commit -m 'Configura Bootstrap'
 ```
 
-**Listado 7**. En el archivo `Gemfile`.
-
-```
-gem 'devise'
-```
-
-**Listado 8**.
-
-```
-$ bundle install
-```
-
-**Listado 9**.
-
-```
-$ rails generate devise:install
-```
-
-**Listado 10**.
-
-```
-$ rails generate devise User
-$ rake db:migrate
-$ rails generate devise:views
-```
-
-**Listado 11**. En `app/views/layouts/application.html.erb`
+**Listado 23**. En `app/views/layouts/application.html.erb`
 
 ```
 <nav class="navbar navbar-default">
@@ -119,116 +261,16 @@ $ rails generate devise:views
 </nav>
 ```
 
-**Listado 12**.
+**Listado 24**.
 
 ```
 $ git add .
 $ git commit -m 'Configura Devise'
 ```
 
-### Implementar la funcionalidad
-
-**Listado 13**.
-
-```
-$ rails g resource Pin user:references title image_url
-$ rake db:migrate
-```
-
-**Listado 14**. En `app/controllers/pins_controller.rb`
-
-```
-def index
-  @pins = Pin.all
-end
-```
-
-**Listado 15**. En `app/views/pins/index.html.erb`
-
-```
-<div id="pins">
-<% @pins.each do |pin| %>
-  <div class="pin panel panel-default">
-    <div class="panel-body">
-      <img src="<%= pin.image_url %>" alt="<%= pin.title %>">
-      <h2><%= pin.title %></h2>
-      <p class="user">Publicado por <%= pin.user.email %></p>
-    </div>
-  </div>
-<% end %>
-</div>
-```
-
-**Listado 16**. En `config/routes.rb`
-
-```
-root 'pins#index'
-```
-
-**Listado 17**. En `app/controllers/pins_controller.rb`
-
-```
-def new
-  @pin = Pin.new
-end
-```
-
-**Listado 18**. En `app/views/pins/new.html.erb`
-
-```
-<div class="container">
-  <div class="row">
-    <div class="col-sm-6 col-sm-offset-3">
-      <h1>Nuevo Pin</h1>
-
-      <%= form_for @pin do |f| %>
-        <div class="form-group">
-          <%= f.label :title %>
-          <%= f.text_field :title, class: "form-control" %>
-        </div>
-        <div class="form-group">
-          <%= f.label :image_url %>
-          <%= f.url_field :image_url, class: "form-control" %>
-        </div>
-
-        <div class="action">
-          <%= f.submit class: "btn btn-primary btn-lg btn-block" %>
-        </div>
-      <% end %>
-    </div>
-  </div>
-</div>
-```
-
-**Listado 19**. En `app/controllers/pins_controller.rb`
-
-```
-def create
-  pin = Pin.new(pin_params)
-  pin.user = current_user
-  if pin.save
-    redirect_to root_path
-  else
-    render :new
-  end
-end
-
-private
-  def pin_params
-    params.require(:pin).permit(:title, :image_url)
-  end
-```
-
-**Listado 20**.
-
-```
-$ git add .
-$ git commit -m 'Implementa la funcionalidad de listar y crear pines'
-```
-
 ## Aplicando estilos
 
-**Listado 21**. En `app/assets/stylesheets/application.scss`
+**Listado 25**. En `app/assets/stylesheets/application.scss`
 
 ```
 body {
@@ -283,46 +325,45 @@ nav {
 }
 ```
 
-**Listado 22**. En `app/views/layouts/application.html.erb`
+**Listado 26**. En `app/views/layouts/application.html.erb`
 
 ```
 <li><%= link_to "Nuevo Pin", new_pin_path %></li>
 ```
 
-Algunos links a imágenes:
-
-* https://s3.amazonaws.com/makeitreal/pins/lamborghini.jpg
-* https://s3.amazonaws.com/makeitreal/pins/luxury-car.jpg
-* https://s3.amazonaws.com/makeitreal/pins/office.jpg
-* https://s3.amazonaws.com/makeitreal/pins/tianmen.jpg
-
 Masonry: https://github.com/kristianmandrup/masonry-rails
 
-**Listado 23**. En el archivo `Gemfile`.
+**Listado 27**. En el archivo `Gemfile`.
 
 ```
 gem 'masonry-rails'
 ```
 
-**Listado 24**.
+**Listado 28**.
 
 ```
 $ bundle install
 ```
 
-**Listado 25**. En `app/assets/stylesheets/application.scss`
+**Listado 29**. En `app/assets/stylesheets/application.scss`
 
 ```
 //= require 'masonry/transitions'
 ```
 
-**Listado 26**. En `app/views/pins/index.html.erb`
+**Listado 30**. En `app/assets/javascripts/application.js`
+
+```
+//= require masonry/jquery.masonry
+```
+
+**Listado 31**. En `app/views/pins/index.html.erb`
 
 ```
 <div id="pins" class="transitions-enabled clearfix masonry">
 ```
 
-**Listado 27**. En `app/assets/javascripts/pins.coffee`
+**Listado 32**. En `app/assets/javascripts/pins.coffee`
 
 ```
 $ ->
@@ -332,7 +373,7 @@ $ ->
       isFitWidth: true
 ```
 
-**Listado 28**.
+**Listado 33**.
 
 ```
 $ git add .
@@ -341,14 +382,14 @@ $ git commit -m 'Aplica estilos CSS y configura Masonry'
 
 ### Publicando a Heroku
 
-**Listado 29**.
+**Listado 34**.
 
 ```
 $ heroku login
 $ heroku create
 ```
 
-**Listado 30**. En `Gemfile`
+**Listado 35**. En `Gemfile`
 
 ```
 group :production do
@@ -357,7 +398,7 @@ group :production do
 end
 ```
 
-**Listado 31**.
+**Listado 36**.
 
 ```
 $ bundle install
@@ -369,7 +410,13 @@ $ heroku run rake db:migrate
 
 ### Aplicar Bootstrap a las vistas Devise
 
-**Listado 32**. En `app/views/devise/sessions/new.html.erb`
+**Listado 37**.
+
+```
+$ rails generate devise:views
+```
+
+**Listado 37**. En `app/views/devise/sessions/new.html.erb`
 
 ```
 <div class="container">
@@ -406,7 +453,7 @@ $ heroku run rake db:migrate
 </div>
 ```
 
-**Listado 33**. En `app/views/devise/registrations/new.html.erb`
+**Listado 38**. En `app/views/devise/registrations/new.html.erb`
 
 ```
 <div class="container">
